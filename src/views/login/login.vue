@@ -1,16 +1,30 @@
 <script setup lang='ts'>
 import {UserModel,LoginAsync,LoginModel} from './login'
-import { setToken } from '@/store/modules/auth/helper'
+import { setTokenobj } from '@/store/modules/auth/helper'
 import {router} from '@/router'
+import {defaultSetting } from '@/store/modules/user/helper'
+import {useMessage } from 'naive-ui'
 
 const umodel : UserModel={username:"test",userpwd:"123456"};
+const ms = useMessage()
  async function login(loginmodel:UserModel)
 {
-
+    if(loginmodel.username=="")
+    {
+        ms.error('用户名不能为空');
+        return;
+    }
+    if(loginmodel.userpwd=="")
+    {
+        ms.error('密码不能为空');
+        return;
+    }
     const  lgmodel  = await LoginAsync<LoginModel>(loginmodel)
     if(lgmodel.data.token != "")
     {
-        setToken(lgmodel.data.token);
+        //setToken(lgmodel.data.token);
+        setTokenobj(lgmodel.data);  
+        //defaultSetting().userInfo.name = lgmodel.data.username;
         //window.location.href = "chat";
         router.push('/chat');
         // router.beforeEach(async (to, from, next) => {
@@ -20,7 +34,8 @@ const umodel : UserModel={username:"test",userpwd:"123456"};
     }
     else    
     {
-        alert('用户名或密码错误');
+        //alert('用户名或密码错误');
+        ms.error('用户名或密码错误');
     }
    
 }

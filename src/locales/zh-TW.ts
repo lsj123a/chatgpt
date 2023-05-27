@@ -57,6 +57,7 @@ export default {
     config: '設定',
     avatarLink: '頭貼連結',
     name: '名稱',
+    password:'密码',
     description: '描述',
     role: '角色設定',
     temperature: 'Temperature',

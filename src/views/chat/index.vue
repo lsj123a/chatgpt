@@ -16,6 +16,10 @@ import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
+import { post } from '@/utils/request'
+import {LoginModel} from '@/views/login/login'
+import { getTokenobj } from '@/store/modules/auth/helper'
+import {router} from '@/router'
 
 let controller = new AbortController()
 
@@ -55,8 +59,75 @@ dataSources.value.forEach((item, index) => {
     updateChatSome(+uuid, index, { loading: false })
 })
 
-function handleSubmit() {
+async function handleSubmit() {
+
+  //判断请求次数
+  var usermodel:LoginModel=getTokenobj();
+  var namemodel : RequeName={username:usermodel.username};
+  var responsemodel = await GetRquestCountAsync<RsesponseModel>(namemodel);
+  if(responsemodel.data.code=='-100')
+  {
+    dialog.warning({
+    title: '提示',
+    content: responsemodel.data.msg,
+    positiveText: '是',
+    negativeText: '否',
+    onPositiveClick: () => {
+      router.push('/update');
+    },
+  })
+    return;
+  }
   onConversation()
+  //更新请求次数
+  var responsemodel = await UpdateRquestCountAsync<RsesponseModel>(namemodel);
+}
+
+class RequeName 
+ {
+    username:string = "";
+ } 
+
+ class RsesponseModel 
+ {
+     code:string= "";
+     msg:string = "";
+ } 
+
+ function GetRquestCount<T>(model:RequeName)
+  {
+   return post<T>({
+        url: 'api/login/getrquestcount',
+        data:model,
+        headers:{'Content-Type':  'application/json'}
+      })
+  }
+
+async function GetRquestCountAsync<T>(model:RequeName) {
+      try {
+         const data = await GetRquestCount<T>(model)
+         return Promise.resolve(data)
+      }  catch (error) {
+         return Promise.reject(error)
+       }
+}
+
+function UpdateRquestCount<T>(model:RequeName)
+  {
+   return post<T>({
+        url: 'api/login/getrquestcount',
+        data: model,
+        headers:{'Content-Type':  'application/json'}
+      })
+  }
+
+async function UpdateRquestCountAsync<T>(model:RequeName) {
+      try {
+         const data = await UpdateRquestCount<T>(model)
+         return Promise.resolve(data)
+      }  catch (error) {
+         return Promise.reject(error)
+       }
 }
 
 async function onConversation() {

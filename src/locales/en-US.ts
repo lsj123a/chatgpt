@@ -57,6 +57,7 @@ export default {
     config: 'Config',
     avatarLink: 'Avatar Link',
     name: 'Name',
+    password:'password',
     description: 'Description',
     role: 'Role',
     temperature: 'Temperature',

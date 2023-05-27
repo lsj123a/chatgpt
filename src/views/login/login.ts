@@ -7,6 +7,8 @@ import { post } from '@/utils/request'
  export class LoginModel 
  {
     token:string="";
+    username:string = "";
+    nickname:string = "";
  } 
 
   //登录逻辑

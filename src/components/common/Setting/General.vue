@@ -8,6 +8,8 @@ import type { UserInfo } from '@/store/modules/user/helper'
 import { getCurrentDate } from '@/utils/functions'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
+import { getTokenobj } from '@/store/modules/auth/helper'
+import { post } from '@/utils/request'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
@@ -21,11 +23,16 @@ const theme = computed(() => appStore.theme)
 const userInfo = computed(() => userStore.userInfo)
 
 const avatar = ref(userInfo.value.avatar ?? '')
+var tokenmodel = getTokenobj();
+//var name = ref(userInfo.value.name ?? '')
+var name = ref(tokenmodel.nickname ?? '')
 
-const name = ref(userInfo.value.name ?? '')
+var password = ref(userInfo.value.password ?? '')
 
 const description = ref(userInfo.value.description ?? '')
 
+var umodel :userinfomodel={username:tokenmodel.username,nickname:tokenmodel.nickname,password:""};
+//name = tokenmodel.nickname;
 const language = computed({
   get() {
     return appStore.language
@@ -62,6 +69,55 @@ const languageOptions: { label: string; key: Language; value: Language }[] = [
 function updateUserInfo(options: Partial<UserInfo>) {
   userStore.updateUserInfo(options)
   ms.success(t('common.success'))
+}
+
+async function updateuser()
+{   var uumodel = getTokenobj();
+    
+    var usermodel:userinfomodel  = {username:uumodel.username, nickname:name.value,password:password.value}
+    //umodel.username = uumodel.username;
+    var responsemodel = await Updateuserinfoasync<RsesponseModel>(usermodel);
+    if(responsemodel.data.code=="200")
+    {
+      var uinfo:UserInfo={avatar:avatar.value,name:name.value,password:"",description:description.value};
+      userStore.updateUserInfo(uinfo);
+      ms.success(responsemodel.data.msg) 
+    }
+    else{
+      ms.success(responsemodel.data.msg)
+    }
+}
+
+class userinfomodel 
+{
+   username:string = "";
+   nickname:string = "";
+   password:string = ""
+}
+
+class RsesponseModel 
+ {
+     code:string= "";
+     msg:string = "";
+ } 
+
+
+ function updateuserinfo<T>(model:userinfomodel)
+  {
+   return post<T>({
+        url: 'api/login/updateuserinfo',
+        data: model,
+        headers:{'Content-Type':  'application/json'}
+      })
+  }
+
+async function Updateuserinfoasync<T>(model:userinfomodel) {
+      try {
+         const data = await updateuserinfo<T>(model)
+         return Promise.resolve(data)
+      }  catch (error) {
+         return Promise.reject(error)
+       }
 }
 
 function handleReset() {
@@ -129,7 +185,7 @@ function handleImportButtonClick(): void {
           <NInput v-model:value="avatar" placeholder="" />
         </div>
         <NButton size="tiny" text type="primary" @click="updateUserInfo({ avatar })">
-          {{ $t('common.save') }}
+          {{ $t('common.save') }} 
         </NButton>
       </div>
       <div class="flex items-center space-x-4">
@@ -137,7 +193,16 @@ function handleImportButtonClick(): void {
         <div class="w-[200px]">
           <NInput v-model:value="name" placeholder="" />
         </div>
-        <NButton size="tiny" text type="primary" @click="updateUserInfo({ name })">
+        <NButton size="tiny" text type="primary" @click="updateuser()">
+          {{ $t('common.save') }}
+        </NButton>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="flex-shrink-0 w-[100px]">{{ $t('setting.password') }}</span>
+        <div class="w-[200px]">
+          <NInput v-model:value="password" placeholder="" />
+        </div>
+        <NButton size="tiny" text type="primary" @click="updateuser()">
           {{ $t('common.save') }}
         </NButton>
       </div>

@@ -1,6 +1,6 @@
 import type { Router } from 'vue-router'
 import { useAuthStoreWithout } from '@/store/modules/auth'
-import { getToken,removeToken } from '@/store/modules/auth/helper'
+import { getTokenobj,removeToken } from '@/store/modules/auth/helper'
 
 export function setupPageGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
@@ -62,7 +62,7 @@ export function setupPageGuard(router: Router) {
       
       // }
       //removeToken();
-      const token = getToken();   
+      const token = getTokenobj();   
       if (to.name !== 'login' && !token) 
       {next({ name: 'login' })
   }

@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('@/views/login/login.vue'),
   },
+  {
+    path: '/update',
+    name: 'update',
+    component: () => import('@/views/update/update.vue'),
+  },
 
   {
     path: '/404',
